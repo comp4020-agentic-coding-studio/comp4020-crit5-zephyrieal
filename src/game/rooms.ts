@@ -730,6 +730,92 @@ const room13: RoomDef = {
   ],
 };
 
+// Room 14 — the crowd. Room 5's NPC-hint idea, scaled up: a long row of
+// near-identical crates (most safe, two subtly dangerous) with an NPC beside
+// it whose lines narrow down which ones creak, and a key sitting openly in
+// the crowd. A gap follows every crate so none of them can ever end up
+// wedged unpushable between its neighbors, and a guard waits behind each
+// dangerous one.
+const room14: RoomDef = {
+  id: "room-14",
+  width: 19,
+  height: 4,
+  playerStart: { x: 0, y: 2 },
+  door: { x: 18, y: 2 },
+  intro: "So many crates. Someone was expecting company.",
+  walls: wallsExcept(19, 4, [
+    { x: 0, y: 2 },
+    { x: 1, y: 2 },
+    { x: 2, y: 2 },
+    { x: 3, y: 2 },
+    { x: 4, y: 2 },
+    { x: 5, y: 2 },
+    { x: 6, y: 2 },
+    { x: 7, y: 2 },
+    { x: 8, y: 2 },
+    { x: 9, y: 2 },
+    { x: 10, y: 2 },
+    { x: 11, y: 2 },
+    { x: 12, y: 2 },
+    { x: 13, y: 2 },
+    { x: 14, y: 2 },
+    { x: 15, y: 2 },
+    { x: 16, y: 2 },
+    { x: 17, y: 2 },
+    { x: 18, y: 2 },
+    { x: 2, y: 1 },
+    { x: 3, y: 1 },
+    { x: 4, y: 1 },
+    { x: 5, y: 1 },
+    { x: 6, y: 1 },
+    { x: 7, y: 1 },
+    { x: 8, y: 1 },
+    { x: 9, y: 1 },
+    { x: 10, y: 1 },
+    { x: 11, y: 1 },
+    { x: 12, y: 1 },
+    { x: 13, y: 1 },
+    { x: 14, y: 1 },
+    { x: 15, y: 1 },
+    { x: 16, y: 1 },
+    { x: 17, y: 1 },
+  ]),
+  boxes: [
+    { id: "b14a", pos: { x: 3, y: 1 }, dangerous: false, clue: "none" },
+    { id: "b14b", pos: { x: 5, y: 1 }, dangerous: false, clue: "none" },
+    {
+      id: "b14c",
+      pos: { x: 7, y: 1 },
+      dangerous: true,
+      clue: "subtle",
+      releasesEnemyId: "e14a",
+    },
+    { id: "b14d", pos: { x: 9, y: 1 }, dangerous: false, clue: "none" },
+    { id: "b14e", pos: { x: 11, y: 1 }, dangerous: false, clue: "none" },
+    {
+      id: "b14f",
+      pos: { x: 13, y: 1 },
+      dangerous: true,
+      clue: "subtle",
+      releasesEnemyId: "e14b",
+    },
+  ],
+  enemies: [
+    { id: "e14a", pos: { x: 16, y: 1 }, active: false, behavior: "guard", kind: "ghost" },
+    { id: "e14b", pos: { x: 17, y: 1 }, active: false, behavior: "guard", kind: "ghost" },
+  ],
+  keys: [{ id: "k14", pos: { x: 15, y: 1 } }],
+  npc: {
+    id: "npc14",
+    pos: { x: 2, y: 1 },
+    lines: [
+      "This many crates, and my knees still ache just looking at them.",
+      "Two of them creak different from the rest. Not the first two, not the last.",
+      "The key's sitting right past the second one, if that's any help.",
+    ],
+  },
+};
+
 // The extent of a room's own floor, in its own (pre-close) coordinates.
 function floorBounds(room: RoomDef): { minX: number; maxX: number; minY: number; maxY: number } {
   const isWall = new Set(room.walls.map((w) => `${w.x},${w.y}`));
@@ -813,4 +899,5 @@ export const rooms: RoomDef[] = [
   room11,
   room12,
   room13,
+  room14,
 ].map(closeRoom);
