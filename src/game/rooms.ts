@@ -64,9 +64,9 @@ const room1: RoomDef = {
 };
 
 // Room 2 — first danger, plus the first key. The door is locked until the
-// key (sitting in the open alcove, away from both the crate and the guard's
-// spawn) is picked up — so the "optional" side room from before is now a
-// required stop, while the guard itself stays entirely avoidable.
+// key (sitting in the open alcove, away from both the crate and the
+// chaser's spawn) is picked up — so the "optional" side room from before is
+// now a required stop, while triggering the crate stays entirely avoidable.
 const room2: RoomDef = {
   id: "room-2",
   width: 6,
@@ -94,16 +94,17 @@ const room2: RoomDef = {
       releasesEnemyId: "e2",
     },
   ],
-  enemies: [{ id: "e2", pos: { x: 1, y: 1 }, active: false, behavior: "guard", kind: "slime" }],
+  enemies: [{ id: "e2", pos: { x: 1, y: 1 }, active: false, behavior: "chase", kind: "slime" }],
   keys: [{ id: "k2", pos: { x: 2, y: 1 } }],
 };
 
 // Room 3 — order matters. The main corridor never touches a box, so the door
 // is always reachable. Two optional side crates each wake a threat; the left
 // one wakes a patrol pacing its pocket's mouth (a lingering player can walk
-// back into it), the right one a confined guard. Pushing the left crate
-// first seals off the right pocket's entrance, so exploring in the wrong
-// order costs you the *other* pocket's discovery, not the exit.
+// back into it), the right one a chase enemy resting back at the entrance,
+// well behind the release point. Pushing the left crate first seals off the
+// right pocket's entrance, so exploring in the wrong order costs you the
+// *other* pocket's discovery, not the exit.
 const room3: RoomDef = {
   id: "room-3",
   width: 7,
@@ -154,7 +155,7 @@ const room3: RoomDef = {
         { x: 1, y: 1 },
       ],
     },
-    { id: "e3a", pos: { x: 6, y: 1 }, active: false, behavior: "guard", kind: "ghost" },
+    { id: "e3a", pos: { x: 0, y: 2 }, active: false, behavior: "chase", kind: "ghost" },
   ],
 };
 
@@ -210,6 +211,13 @@ const room4: RoomDef = {
     },
   ],
   enemies: [
+    // Stationary: these two sit on opposite sides of the open corridor
+    // (row 1 above it, row 3 below), and a chaser isn't confined to its own
+    // row — it drifts toward wherever the player currently is. A player who
+    // triggers one while circling back for the key below would have it cut
+    // straight across the corridor, including onto the door tile itself.
+    // Both pockets are meant to be safe to explore either way, so both stay
+    // guards.
     { id: "e4d2", pos: { x: 6, y: 1 }, active: false, behavior: "guard", kind: "ghost" },
     { id: "e4d4", pos: { x: 6, y: 3 }, active: false, behavior: "guard", kind: "ghost" },
   ],
@@ -246,7 +254,7 @@ const room5: RoomDef = {
       releasesEnemyId: "e5",
     },
   ],
-  enemies: [{ id: "e5", pos: { x: 0, y: 2 }, active: false, behavior: "guard", kind: "skeleton" }],
+  enemies: [{ id: "e5", pos: { x: 0, y: 2 }, active: false, behavior: "chase", kind: "skeleton" }],
   npc: {
     id: "npc5",
     pos: { x: 2, y: 1 },
@@ -346,8 +354,15 @@ const room7: RoomDef = {
     },
   ],
   enemies: [
+    // A wall column separates the two pockets, so clearing this one only
+    // to have it start chasing would force a blind re-entry into the next
+    // pocket's mouth to reach the door — a chaser that's been trailing
+    // along the corridor ends up shadowing the player's own column exactly,
+    // so stepping back up into pocket B would step right onto it. Only the
+    // *last* pocket before the door is safe to wake a chaser in; this one
+    // stays a stationary guard.
     { id: "e7a", pos: { x: 1, y: 1 }, active: false, behavior: "guard", kind: "slime" },
-    { id: "e7b", pos: { x: 6, y: 1 }, active: false, behavior: "guard", kind: "ghost" },
+    { id: "e7b", pos: { x: 6, y: 1 }, active: false, behavior: "chase", kind: "ghost" },
   ],
   keys: [
     { id: "k7a", pos: { x: 2, y: 1 } },
@@ -359,7 +374,8 @@ const room7: RoomDef = {
 // order-matters shape from two side crates to three: a safe decoy (no clue,
 // just a normal push — a reminder that not everything is a trap), a
 // subtle-danger crate waking a patrol, and an obvious-danger crate waking a
-// guard, all reachable from the same open corridor.
+// chaser resting well back at the corridor's start, all reachable from the
+// same open corridor.
 const room8: RoomDef = {
   id: "room-8",
   width: 9,
@@ -415,7 +431,7 @@ const room8: RoomDef = {
         { x: 1, y: 1 },
       ],
     },
-    { id: "e8g", pos: { x: 8, y: 1 }, active: false, behavior: "guard", kind: "ghost" },
+    { id: "e8g", pos: { x: 0, y: 2 }, active: false, behavior: "chase", kind: "ghost" },
   ],
 };
 
@@ -468,8 +484,19 @@ const room9: RoomDef = {
     },
   ],
   enemies: [
+    // Stationary: a wall separates this gate from the chase pocket ahead, so
+    // a chaser released here would still be trailing (shadowing the
+    // player's own column) when the player needs to climb back up into that
+    // next pocket — stepping straight onto it. Only the room's real, final
+    // chase (below) gets to give chase.
     { id: "e9guard", pos: { x: 1, y: 1 }, active: false, behavior: "guard", kind: "ghost" },
-    { id: "e9chase", pos: { x: 6, y: 2 }, active: false, behavior: "chase", kind: "demon" },
+    // Spawned on row 2 (not row 1, where the box sits) so it's already one
+    // row below the release point when it wakes. The player is then forced
+    // to descend onto that same row to reach the door — with only a 2-tile
+    // gap, that descent lands exactly 1 tile from the enemy, which closes it
+    // unavoidably next turn. 3 tiles clears it: the same margin e15's finale
+    // chase uses for the same reason.
+    { id: "e9chase", pos: { x: 5, y: 2 }, active: false, behavior: "chase", kind: "demon" },
   ],
   keys: [{ id: "k9", pos: { x: 2, y: 1 } }],
 };
@@ -592,8 +619,13 @@ const room11: RoomDef = {
     { id: "b11c", pos: { x: 12, y: 1 }, dangerous: false, clue: "none" },
   ],
   enemies: [
+    // e11a stays a stationary guard: a wall separates its pocket from
+    // pocket B ahead, so a chaser released here would still be trailing
+    // right behind (shadowing the player's own column) when the player
+    // climbs back up into pocket B — landing on it. e11b, the last
+    // mandatory pocket before the door, is safe to give chase.
     { id: "e11a", pos: { x: 1, y: 1 }, active: false, behavior: "guard", kind: "slime" },
-    { id: "e11b", pos: { x: 6, y: 1 }, active: false, behavior: "guard", kind: "ghost" },
+    { id: "e11b", pos: { x: 6, y: 1 }, active: false, behavior: "chase", kind: "ghost" },
   ],
   keys: [
     { id: "k11a", pos: { x: 2, y: 1 } },
@@ -665,8 +697,11 @@ const room12: RoomDef = {
 
 // Room 13 — three keys, three styles. Widens room 7 again: three pockets,
 // three keys, no decoys this time — one obvious clue behind a guard, one
-// subtle clue behind a guard, and one key just sitting in the open with no
-// fight at all, the reward for having stopped expecting one every time.
+// subtle clue behind a chaser (saved for last, since a wall separates every
+// pocket here and a chaser released early would still be shadowing the
+// player on the climb back into the next one), and one key just sitting in
+// the open with no fight at all, the reward for having stopped expecting one
+// every time.
 const room13: RoomDef = {
   id: "room-13",
   width: 16,
@@ -721,7 +756,7 @@ const room13: RoomDef = {
   ],
   enemies: [
     { id: "e13a", pos: { x: 1, y: 1 }, active: false, behavior: "guard", kind: "slime" },
-    { id: "e13b", pos: { x: 6, y: 1 }, active: false, behavior: "guard", kind: "ghost" },
+    { id: "e13b", pos: { x: 6, y: 1 }, active: false, behavior: "chase", kind: "ghost" },
   ],
   keys: [
     { id: "k13a", pos: { x: 2, y: 1 } },
@@ -734,8 +769,8 @@ const room13: RoomDef = {
 // near-identical crates (most safe, two subtly dangerous) with an NPC beside
 // it whose lines narrow down which ones creak, and a key sitting openly in
 // the crowd. A gap follows every crate so none of them can ever end up
-// wedged unpushable between its neighbors, and a guard waits behind each
-// dangerous one.
+// wedged unpushable between its neighbors, and a chase enemy rests well
+// behind each dangerous one.
 const room14: RoomDef = {
   id: "room-14",
   width: 19,
@@ -801,8 +836,8 @@ const room14: RoomDef = {
     },
   ],
   enemies: [
-    { id: "e14a", pos: { x: 16, y: 1 }, active: false, behavior: "guard", kind: "ghost" },
-    { id: "e14b", pos: { x: 17, y: 1 }, active: false, behavior: "guard", kind: "ghost" },
+    { id: "e14a", pos: { x: 4, y: 1 }, active: false, behavior: "chase", kind: "ghost" },
+    { id: "e14b", pos: { x: 10, y: 1 }, active: false, behavior: "chase", kind: "ghost" },
   ],
   keys: [{ id: "k14", pos: { x: 15, y: 1 } }],
   npc: {
@@ -913,8 +948,13 @@ const room15: RoomDef = {
     },
   ],
   enemies: [
+    // e15a stays a stationary guard: a wall separates its pocket from
+    // pocket B, so a chaser here would still be shadowing the player's
+    // column when they climb back into B. e15b's pocket opens straight onto
+    // the long unbroken hall the rest of the room runs through, so it's the
+    // last "climb back up" moment in the room and safe to give chase.
     { id: "e15a", pos: { x: 1, y: 1 }, active: false, behavior: "guard", kind: "slime" },
-    { id: "e15b", pos: { x: 6, y: 1 }, active: false, behavior: "guard", kind: "ghost" },
+    { id: "e15b", pos: { x: 6, y: 1 }, active: false, behavior: "chase", kind: "ghost" },
     {
       id: "e15h",
       pos: { x: 14, y: 1 },
