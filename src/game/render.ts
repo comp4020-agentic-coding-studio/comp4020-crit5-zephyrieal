@@ -44,11 +44,14 @@ function classifyWall(width: number, height: number, x: number, y: number): Wall
   if (bottom && left) return { kind: "corner-bottom", rotate: 0, flipX: true, overlap: true };
   if (bottom && right) return { kind: "corner-bottom", rotate: 0, overlap: true };
   if (top) return { kind: "edge", rotate: 0, flipX: true };
-  // The bottom edge reuses the same vertical wall-side sprite as the
-  // left/right walls (unrotated, laid along the row) rather than the
-  // horizontal edge sprite, so it reads as the same block texture the
-  // corners are made of, continuing seamlessly from them.
-  if (bottom) return { kind: "side", rotate: 0 };
+  // The bottom edge reuses the same wall-side sprite as the left/right
+  // walls, rotated 90deg, rather than the horizontal edge sprite, so it
+  // reads as the same block texture the corners are made of, continuing
+  // seamlessly from them. Unrotated, the sprite's right-anchored vertical
+  // band only covers the tile's right half, leaving the left half a
+  // transparent gap; rotating the (square) tile 90deg turns that band into
+  // a horizontal one flush against the tile's true bottom edge instead.
+  if (bottom) return { kind: "side", rotate: 90 };
   // wall-side.png's lit face reads on its left, so the left wall (which
   // faces right, into the room) needs it mirrored; the right wall (facing
   // left, into the room) already has the lit face pointing the right way.
