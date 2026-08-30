@@ -601,6 +601,68 @@ const room11: RoomDef = {
   ],
 };
 
+// Room 12 — there and back. First room where the door sits right beside
+// spawn instead of at the far end: it's locked, and the only key is all the
+// way across a long two-row hall. An obvious-danger crate sits in view along
+// the direct row, tempting a patrol out of hiding — a cautious player can
+// beeline via the other row and never wake it, but anyone who explores the
+// straight line has to share both rows with a roaming skeleton on the way
+// back too.
+const room12: RoomDef = {
+  id: "room-12",
+  width: 11,
+  height: 4,
+  playerStart: { x: 0, y: 2 },
+  door: { x: 0, y: 1 },
+  walls: wallsExcept(11, 4, [
+    { x: 0, y: 1 },
+    { x: 1, y: 1 },
+    { x: 2, y: 1 },
+    { x: 3, y: 1 },
+    { x: 4, y: 1 },
+    { x: 5, y: 1 },
+    { x: 6, y: 1 },
+    { x: 7, y: 1 },
+    { x: 8, y: 1 },
+    { x: 9, y: 1 },
+    { x: 10, y: 1 },
+    { x: 0, y: 2 },
+    { x: 1, y: 2 },
+    { x: 2, y: 2 },
+    { x: 3, y: 2 },
+    { x: 4, y: 2 },
+    { x: 5, y: 2 },
+    { x: 6, y: 2 },
+    { x: 7, y: 2 },
+    { x: 8, y: 2 },
+    { x: 9, y: 2 },
+    { x: 10, y: 2 },
+  ]),
+  boxes: [
+    {
+      id: "b12",
+      pos: { x: 3, y: 1 },
+      dangerous: true,
+      clue: "obvious",
+      releasesEnemyId: "e12",
+    },
+  ],
+  enemies: [
+    {
+      id: "e12",
+      pos: { x: 5, y: 1 },
+      active: false,
+      behavior: "patrol",
+      kind: "skeleton",
+      patrolRoute: [
+        { x: 5, y: 1 },
+        { x: 9, y: 1 },
+      ],
+    },
+  ],
+  keys: [{ id: "k12", pos: { x: 10, y: 1 } }],
+};
+
 // The extent of a room's own floor, in its own (pre-close) coordinates.
 function floorBounds(room: RoomDef): { minX: number; maxX: number; minY: number; maxY: number } {
   const isWall = new Set(room.walls.map((w) => `${w.x},${w.y}`));
@@ -682,4 +744,5 @@ export const rooms: RoomDef[] = [
   room9,
   room10,
   room11,
+  room12,
 ].map(closeRoom);
