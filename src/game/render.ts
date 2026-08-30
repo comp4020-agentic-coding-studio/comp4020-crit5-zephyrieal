@@ -60,6 +60,20 @@ function classifyWall(width: number, height: number, x: number, y: number): Wall
   return { kind: "edge", rotate: 0 };
 }
 
+// Wall collision is exactly room.walls — untouched here. But the leftmost
+// and rightmost wall columns sit at the very edge of #game-root, one tile
+// out from the floor they border, which reads as a disconnected strip
+// rather than a boundary the player can actually feel approaching. Drawing
+// those columns one tile further in (toward the floor they guard) puts the
+// solid-looking wall art flush against the reachable area instead, while
+// the true collision boundary — still at the untouched x=0 / x=width-1 —
+// stays exactly where the code says it is.
+function visualWallX(width: number, x: number): number {
+  if (x === 0) return 1;
+  if (x === width - 1) return width - 2;
+  return x;
+}
+
 function wallCell(x: number, y: number, style: WallStyle): string {
   const { kind, rotate, flipX, flipY, overlap } = style;
   const fx = flipX ? -1 : 1;
@@ -76,7 +90,7 @@ export function renderRoom(root: HTMLElement, room: RoomDef, state: GameState): 
 
   for (const wall of room.walls) {
     const style = classifyWall(room.width, room.height, wall.x, wall.y);
-    parts.push(wallCell(wall.x, wall.y, style));
+    parts.push(wallCell(visualWallX(room.width, wall.x), wall.y, style));
   }
 
   const locked = (room.keys ?? []).some((k) => !state.keysCollected.includes(k.id));
