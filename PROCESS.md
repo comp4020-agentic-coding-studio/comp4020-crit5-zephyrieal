@@ -1,70 +1,62 @@
 # Process overview
 
-<!-- TEMPLATE: this file is a shape to fill in, not a form. Replace everything
-     in it with your own overview, and delete this comment — `pnpm
-     check:evidence` will remind you if it's still here. -->
-
-A reading-guide to how the work came together --- a map to your process, not an
-essay about it. Markers read this file and follow its citations; they don't
-trawl the repo for evidence you didn't point at, so if a moment mattered, cite
-it.
-
-This file is the shape; the course site's
-[assessment page](https://comp.anu.edu.au/courses/comp4020-agentic-coding-studio/topics/assessment/#what-you-submit)
-is the requirement, and its
-[word counts](https://comp.anu.edu.au/courses/comp4020-agentic-coding-studio/topics/assessment/#word-counts)
-cover every deliverable.
+A reading-guide to how Descent came together.
 
 ## What I built
 
-One paragraph: the thing, and the idea behind it.
+Descent is a turn-based dungeon-escape game across 16 rooms. Pushing a crate
+sometimes releases an enemy — a guard that holds its ground, a chaser that
+pursues, or a patrol pacing a fixed route — and every dangerous crate carries
+an obvious or subtle visual clue before you touch it. Keys, an NPC with
+dialogue, and a locked door round out the mechanics. There's no on-screen
+instruction anywhere: the crit's brief is "no tutorials", so the affordances
+(a crate creaking, an enemy sprite, a locked-door glow) have to teach the rules
+by themselves.
 
 ## The moments that mattered
 
-Three or four for an assignment; fewer is fine for a weekly prototype. Keep the
-list short so each moment has room to do all four jobs:
+1. **The engine is a pure reducer, on purpose.** `step(room, state, action) ->
+   state` in `src/game/engine.ts` holds every rule — movement, box-pushing,
+   enemy resolution, loss/win — and never touches the DOM; `render.ts` only
+   reads state back out. The obvious shortcut was to fold enemy movement into
+   the same code that updates the screen. Keeping them apart is what let a
+   test file drive full playthroughs later with no browser involved.
+   [`bc94c23`](https://github.com/comp4020-agentic-coding-studio/comp4020-crit5-zephyrieal/commit/bc94c23)
 
-1. **what happened** --- the problem, or the thing that went wrong
-2. **what you did instead of the obvious thing** --- the call you made, and why
-   it beat the obvious one
-3. **how you knew it was right** --- the check you ran, the viewport you looked
-   at, what you read before accepting the diff
-4. **the citation** --- a commit or commit range, a `CLAUDE.md` change, a check
-   that went from red to green, a prompt paired with the commit it produced
+2. **Room 15's finale bug was found by reading the engine's turn order, not
+   by replaying the room until it broke.** A crate could be pushed into a
+   position that either soft-locked the level or made the following catch
+   unavoidable, depending on push order. `checkLoss` runs *after*
+   `resolveEnemies` and *before* `checkWin` — so even a move onto the door
+   tile isn't automatically safe if an enemy's post-move position lands on
+   the player first. Tracing that ordering by hand against the room's exact
+   layout, rather than trial-and-error playtesting, is what found the fix.
+   [`da8d4de`](https://github.com/comp4020-agentic-coding-studio/comp4020-crit5-zephyrieal/commit/da8d4de)
 
-Jobs 2 and 3 are the ones the repo can't tell a reader on its own, so they're
-where the marks are. The strongest moments are the ones where a correction
-landed in the **harness** --- the standards and checks your work has to satisfy
---- rather than in a retry: a rule added to `CLAUDE.md`, a check wired up, an
-attempt thrown away. Retrying until it passes is the routine case, and changing
-what the work runs against is the skilled one.
+3. **Converting stationary guards into chasers was checked by scripted
+   playthroughs of the real engine, not by eyeballing ten rooms.** I wrote a
+   temporary vitest file that imports the actual `rooms` and `step`, scripts
+   a full move sequence per room, and asserts `phase === "won"`. That harness
+   is what caught a genuine bug — room 9's chase enemy spawned only 2 tiles
+   from its release box on a different row, which made the player's forced
+   next move land exactly 1 tile away and guaranteed a catch — rather than me
+   shipping a change I'd only reasoned through on paper. Two of my own test
+   sequences also failed first (an off-by-one from misreading `closeRoom`'s
+   edge-conditional padding, and a crate chain-pushed onto the door's own
+   push-target), which is exactly the kind of thing hand-tracing misses and a
+   real engine run doesn't.
+   [`d92221a`](https://github.com/comp4020-agentic-coding-studio/comp4020-crit5-zephyrieal/commit/d92221a)
 
-Cite each moment as a link whose text is the commit hash or range and whose
-target is this repo's commit or compare URL, so a reader clicks straight to the
-evidence:
-
-- one commit: [`a1b2c3d`](https://github.com/YOUR-ORG/YOUR-REPO/commit/a1b2c3d)
-- a range:
-  [`a1b2c3d...e4f5a6b`](https://github.com/YOUR-ORG/YOUR-REPO/compare/a1b2c3d...e4f5a6b)
-
-To pair a prompt with the commit it produced, quote the prompt (curated, not a
-full transcript) next to the citation:
-
-> the prompt, verbatim
-
-Screenshots are welcome where one carries the verification better than a
-sentence does. Commit the file to this repo and link it with a **relative**
-path, which is what makes it render on GitHub: `![alt text](docs/before.png)`.
-Images don't count towards the word count and don't replace the citation.
+4. **The subtitle came out because the brief says so, not because it read
+   badly.** The page had a visible line spelling out the mechanic in plain
+   English ("...pushing crates and reading the room"). `spec/crit-5.test.ts`
+   encodes the brief's "no tutorials" line as a real check (no
+   how-to-play/instructions copy anywhere in the built page); cutting the
+   subtitle entirely rather than softening it is what that contract actually
+   asks for.
+   [`a456bdb`](https://github.com/comp4020-agentic-coding-studio/comp4020-crit5-zephyrieal/commit/a456bdb)
 
 ## Before you ship
 
-`pnpm check:evidence` verifies your citations resolve to real commits, that a
-reflection entry the marker reads is in `reflections/`, and that your
-`CLAUDE.md` is there --- before a marker ever opens the file. It checks that
-your map is traceable, not that it is good: the marker judges whether your
-small, deliberately chosen set of moments shows real judgement and reflection. A
-green check is not a substitute for that curation.
-
-Images aren't checked: unlike a citation whose SHA doesn't resolve, a broken
-image is visible the moment this file is rendered on GitHub.
+`pnpm check` is green (typecheck, build, and both `spec/invariants.test.ts`
+and `spec/crit-5.test.ts`) as of the commits cited above.
