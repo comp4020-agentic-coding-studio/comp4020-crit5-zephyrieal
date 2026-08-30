@@ -9,7 +9,7 @@ import "../styles/styles.css";
     <title>COMP4020 prototype</title>
     <meta
       name="description"
-      content="Replace this with one sentence saying what this page is. A search result and a link preview both show it."
+      content="A small dungeon you escape by pushing crates and reading the room."
     />
 
     <!--
@@ -23,18 +23,25 @@ import "../styles/styles.css";
 
   </head>
   <body>
-    <header>
-      <nav aria-label="Primary">
-        <a href="./">Home</a>
-      </nav>
-    </header>
-    <main>
-      <h1>COMP4020 prototype</h1>
-      <p>
-        Replace this with your prototype. This week's brief is on the course website;
-        <code>spec/README.md</code> explains how the checks in this repo relate to it.
-      </p>
-    </main>
+    <div class="page">
+      <header>
+        <nav aria-label="Primary">
+          <a href="./">Home</a>
+        </nav>
+      </header>
+      <main>
+        <h1>Descent</h1>
+        <p class="subtitle">A small dungeon you escape by pushing crates and reading the room.</p>
+        <div class="game-frame">
+          <div id="game-root" aria-label="dungeon"></div>
+        </div>
+        <p id="dialogue" hidden></p>
+        <p id="outcome" role="status" aria-live="polite"></p>
+      </main>
+      <footer>
+        <p>COMP4020 crit prototype</p>
+      </footer>
+    </div>
     <script src="../scripts/main.ts"></script>
   </body>
 </html>
