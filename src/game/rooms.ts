@@ -419,11 +419,11 @@ const room8: RoomDef = {
   ],
 };
 
-// Room 9 — finale. A key-gate guarded by the harder subtle clue opens onto
-// room 6's exact chase shape: an obvious-danger crate sitting in the only
-// path, a chase enemy resting just behind its release point, and a straight
-// run to the door. The payoff is doing the clue/key work correctly and then
-// out-running the chase, back to back in one room.
+// Room 9 — key-gate into a chase. A key-gate guarded by the harder subtle
+// clue opens onto room 6's exact chase shape: an obvious-danger crate sitting
+// in the only path, a chase enemy resting just behind its release point, and
+// a straight run to the door. The payoff is doing the clue/key work correctly
+// and then out-running the chase, back to back in one room.
 const room9: RoomDef = {
   id: "room-9",
   width: 12,
@@ -472,6 +472,66 @@ const room9: RoomDef = {
     { id: "e9chase", pos: { x: 6, y: 2 }, active: false, behavior: "chase", kind: "demon" },
   ],
   keys: [{ id: "k9", pos: { x: 2, y: 1 } }],
+};
+
+// Room 10 — the watched hall. First room where a triggered enemy roams the
+// open main path instead of a side pocket: a two-row-tall hall (both rows
+// floor, room 8's shape stretched out), with an obvious-danger crate near the
+// start waking a patrol whose route spans most of the hall's length on one
+// row. Because both rows are floor everywhere, the player can always dodge
+// by shifting to the other row — a reaction, not a timing puzzle.
+const room10: RoomDef = {
+  id: "room-10",
+  width: 11,
+  height: 4,
+  playerStart: { x: 0, y: 2 },
+  door: { x: 10, y: 2 },
+  walls: wallsExcept(11, 4, [
+    { x: 0, y: 1 },
+    { x: 1, y: 1 },
+    { x: 2, y: 1 },
+    { x: 3, y: 1 },
+    { x: 4, y: 1 },
+    { x: 5, y: 1 },
+    { x: 6, y: 1 },
+    { x: 7, y: 1 },
+    { x: 8, y: 1 },
+    { x: 9, y: 1 },
+    { x: 10, y: 1 },
+    { x: 0, y: 2 },
+    { x: 1, y: 2 },
+    { x: 2, y: 2 },
+    { x: 3, y: 2 },
+    { x: 4, y: 2 },
+    { x: 5, y: 2 },
+    { x: 6, y: 2 },
+    { x: 7, y: 2 },
+    { x: 8, y: 2 },
+    { x: 9, y: 2 },
+    { x: 10, y: 2 },
+  ]),
+  boxes: [
+    {
+      id: "b10",
+      pos: { x: 2, y: 1 },
+      dangerous: true,
+      clue: "obvious",
+      releasesEnemyId: "e10",
+    },
+  ],
+  enemies: [
+    {
+      id: "e10",
+      pos: { x: 4, y: 1 },
+      active: false,
+      behavior: "patrol",
+      kind: "skeleton",
+      patrolRoute: [
+        { x: 4, y: 1 },
+        { x: 9, y: 1 },
+      ],
+    },
+  ],
 };
 
 // The extent of a room's own floor, in its own (pre-close) coordinates.
@@ -553,4 +613,5 @@ export const rooms: RoomDef[] = [
   room7,
   room8,
   room9,
+  room10,
 ].map(closeRoom);
