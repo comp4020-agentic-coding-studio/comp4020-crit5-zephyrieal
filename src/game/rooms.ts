@@ -816,6 +816,115 @@ const room14: RoomDef = {
   },
 };
 
+// Room 15 — finale: the gauntlet. Chains three things the player has now
+// seen separately, back to back in one room: room 7's two-key pocket gate,
+// room 10/12's roaming patrol across an open two-row hall, and room 6/9's
+// exact chase-sprint shape at the very end. Clear the gate, dodge the
+// patrol, then outrun the chase to the door.
+const room15: RoomDef = {
+  id: "room-15",
+  width: 25,
+  height: 4,
+  playerStart: { x: 0, y: 2 },
+  door: { x: 24, y: 2 },
+  walls: wallsExcept(25, 4, [
+    { x: 0, y: 2 },
+    { x: 1, y: 2 },
+    { x: 2, y: 2 },
+    { x: 3, y: 2 },
+    { x: 4, y: 2 },
+    { x: 5, y: 2 },
+    { x: 6, y: 2 },
+    { x: 7, y: 2 },
+    { x: 8, y: 2 },
+    { x: 9, y: 2 },
+    { x: 10, y: 2 },
+    { x: 11, y: 2 },
+    { x: 12, y: 2 },
+    { x: 13, y: 2 },
+    { x: 14, y: 2 },
+    { x: 15, y: 2 },
+    { x: 16, y: 2 },
+    { x: 17, y: 2 },
+    { x: 18, y: 2 },
+    { x: 19, y: 2 },
+    { x: 20, y: 2 },
+    { x: 21, y: 2 },
+    { x: 22, y: 2 },
+    { x: 23, y: 2 },
+    { x: 24, y: 2 },
+    // pocket A (2-key gate)
+    { x: 1, y: 1 },
+    { x: 2, y: 1 },
+    { x: 3, y: 1 },
+    { x: 4, y: 1 },
+    // pocket B (2-key gate)
+    { x: 6, y: 1 },
+    { x: 7, y: 1 },
+    { x: 8, y: 1 },
+    { x: 9, y: 1 },
+    // two-row hall
+    { x: 11, y: 1 },
+    { x: 12, y: 1 },
+    { x: 13, y: 1 },
+    { x: 14, y: 1 },
+    { x: 15, y: 1 },
+    { x: 16, y: 1 },
+    { x: 17, y: 1 },
+    { x: 18, y: 1 },
+  ]),
+  boxes: [
+    {
+      id: "b15a",
+      pos: { x: 3, y: 1 },
+      dangerous: true,
+      clue: "obvious",
+      releasesEnemyId: "e15a",
+    },
+    {
+      id: "b15b",
+      pos: { x: 8, y: 1 },
+      dangerous: true,
+      clue: "subtle",
+      releasesEnemyId: "e15b",
+    },
+    {
+      id: "b15h",
+      pos: { x: 12, y: 1 },
+      dangerous: true,
+      clue: "obvious",
+      releasesEnemyId: "e15h",
+    },
+    {
+      id: "b15c",
+      pos: { x: 19, y: 2 },
+      dangerous: true,
+      clue: "obvious",
+      releasesEnemyId: "e15c",
+    },
+  ],
+  enemies: [
+    { id: "e15a", pos: { x: 1, y: 1 }, active: false, behavior: "guard", kind: "slime" },
+    { id: "e15b", pos: { x: 6, y: 1 }, active: false, behavior: "guard", kind: "ghost" },
+    {
+      id: "e15h",
+      pos: { x: 14, y: 1 },
+      active: false,
+      behavior: "patrol",
+      kind: "skeleton",
+      patrolRoute: [
+        { x: 14, y: 1 },
+        { x: 18, y: 1 },
+      ],
+    },
+    { id: "e15c", pos: { x: 18, y: 2 }, active: false, behavior: "chase", kind: "demon" },
+  ],
+  keys: [
+    { id: "k15a", pos: { x: 2, y: 1 } },
+    { id: "k15b", pos: { x: 7, y: 1 } },
+  ],
+};
+
 // The extent of a room's own floor, in its own (pre-close) coordinates.
 function floorBounds(room: RoomDef): { minX: number; maxX: number; minY: number; maxY: number } {
   const isWall = new Set(room.walls.map((w) => `${w.x},${w.y}`));
@@ -900,4 +1009,5 @@ export const rooms: RoomDef[] = [
   room12,
   room13,
   room14,
+  room15,
 ].map(closeRoom);
