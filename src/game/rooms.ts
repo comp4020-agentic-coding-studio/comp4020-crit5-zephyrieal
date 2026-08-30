@@ -863,7 +863,10 @@ const room15: RoomDef = {
     { x: 7, y: 1 },
     { x: 8, y: 1 },
     { x: 9, y: 1 },
-    // two-row hall
+    // two-row hall, all the way through to the door: row 2 alone would let
+    // the finale crate (b15c) get chain-pushed one cell short of the door
+    // with no way around it, so row 1 stays open the whole rest of the way
+    // and doubles as the escape route once the chase is loose.
     { x: 11, y: 1 },
     { x: 12, y: 1 },
     { x: 13, y: 1 },
@@ -872,6 +875,12 @@ const room15: RoomDef = {
     { x: 16, y: 1 },
     { x: 17, y: 1 },
     { x: 18, y: 1 },
+    { x: 19, y: 1 },
+    { x: 20, y: 1 },
+    { x: 21, y: 1 },
+    { x: 22, y: 1 },
+    { x: 23, y: 1 },
+    { x: 24, y: 1 },
   ]),
   boxes: [
     {
@@ -917,7 +926,13 @@ const room15: RoomDef = {
         { x: 18, y: 1 },
       ],
     },
-    { id: "e15c", pos: { x: 18, y: 2 }, active: false, behavior: "chase", kind: "demon" },
+    // Spawned 3 tiles back from the crate's cell (matching room 9's chase
+    // gap), not adjacent to it: a chase enemy resting right next to where the
+    // triggering push lands the player closes that gap to zero on its very
+    // first step, before the player can ever move again — an unavoidable,
+    // instant loss every time. 3 tiles gives the player a turn of breathing
+    // room, after which the gap holds steady for the rest of the sprint.
+    { id: "e15c", pos: { x: 16, y: 2 }, active: false, behavior: "chase", kind: "demon" },
   ],
   keys: [
     { id: "k15a", pos: { x: 2, y: 1 } },
