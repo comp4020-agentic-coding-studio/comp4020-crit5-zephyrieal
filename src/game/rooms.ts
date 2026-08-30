@@ -534,6 +534,73 @@ const room10: RoomDef = {
   ],
 };
 
+// Room 11 — three pockets, two keys, one decoy. Extends room 7's two-key
+// idea with a third pocket that has no key and no enemy — just a plain
+// crate — so a player who's learned "every pocket has a fight" gets a pocket
+// that's genuinely nothing. Both real keys are still required for the door.
+const room11: RoomDef = {
+  id: "room-11",
+  width: 16,
+  height: 4,
+  playerStart: { x: 0, y: 2 },
+  door: { x: 15, y: 2 },
+  walls: wallsExcept(16, 4, [
+    { x: 0, y: 2 },
+    { x: 1, y: 2 },
+    { x: 2, y: 2 },
+    { x: 3, y: 2 },
+    { x: 4, y: 2 },
+    { x: 5, y: 2 },
+    { x: 6, y: 2 },
+    { x: 7, y: 2 },
+    { x: 8, y: 2 },
+    { x: 9, y: 2 },
+    { x: 10, y: 2 },
+    { x: 11, y: 2 },
+    { x: 12, y: 2 },
+    { x: 13, y: 2 },
+    { x: 14, y: 2 },
+    { x: 15, y: 2 },
+    { x: 1, y: 1 },
+    { x: 2, y: 1 },
+    { x: 3, y: 1 },
+    { x: 4, y: 1 },
+    { x: 6, y: 1 },
+    { x: 7, y: 1 },
+    { x: 8, y: 1 },
+    { x: 9, y: 1 },
+    { x: 11, y: 1 },
+    { x: 12, y: 1 },
+    { x: 13, y: 1 },
+    { x: 14, y: 1 },
+  ]),
+  boxes: [
+    {
+      id: "b11a",
+      pos: { x: 3, y: 1 },
+      dangerous: true,
+      clue: "obvious",
+      releasesEnemyId: "e11a",
+    },
+    {
+      id: "b11b",
+      pos: { x: 8, y: 1 },
+      dangerous: true,
+      clue: "subtle",
+      releasesEnemyId: "e11b",
+    },
+    { id: "b11c", pos: { x: 12, y: 1 }, dangerous: false, clue: "none" },
+  ],
+  enemies: [
+    { id: "e11a", pos: { x: 1, y: 1 }, active: false, behavior: "guard", kind: "slime" },
+    { id: "e11b", pos: { x: 6, y: 1 }, active: false, behavior: "guard", kind: "ghost" },
+  ],
+  keys: [
+    { id: "k11a", pos: { x: 2, y: 1 } },
+    { id: "k11b", pos: { x: 7, y: 1 } },
+  ],
+};
+
 // The extent of a room's own floor, in its own (pre-close) coordinates.
 function floorBounds(room: RoomDef): { minX: number; maxX: number; minY: number; maxY: number } {
   const isWall = new Set(room.walls.map((w) => `${w.x},${w.y}`));
@@ -614,4 +681,5 @@ export const rooms: RoomDef[] = [
   room8,
   room9,
   room10,
+  room11,
 ].map(closeRoom);
